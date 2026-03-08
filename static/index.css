@@ -171,7 +171,6 @@ body {
   color: #6c7293;
 }
 
-/* Password Toggle */
 .password-group {
   padding-right: 50px;
 }
@@ -315,7 +314,6 @@ body {
   color: #3d4468;
 }
 
-/* Neumorphic Button */
 .neu-button {
   width: 100%;
   background: #e0e5ec;
@@ -410,7 +408,6 @@ body {
   opacity: 1;
 }
 
-/* Divider */
 .divider {
   display: flex;
   align-items: center;
@@ -432,7 +429,6 @@ body {
   letter-spacing: 1px;
 }
 
-/* Social Login */
 .social-login {
   display: flex;
   justify-content: center;
@@ -476,7 +472,6 @@ body {
   height: 22px;
 }
 
-/* Signup Link */
 .signup-link {
   text-align: center;
 }
@@ -536,7 +531,7 @@ body {
   transform: translateY(20px);
   transition: all 0.5s ease;
 }
-/* Success Message */
+
 .success-message {
   display: none;
   text-align: center;

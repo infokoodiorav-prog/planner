@@ -228,7 +228,7 @@ async function addPerson() {
     return;
   }
 
-  const password = ""; //genereeri parool
+  const password = ""; //genereerib parooli
 
   try {
     const response = await fetch("/add-person", {

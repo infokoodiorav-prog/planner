@@ -118,7 +118,6 @@ async function loadTasks() {
     });
     const text = await res.text();
 
-    // Kontrollime, kas see on JSON või HTML (login page)
     let tasks;
     try {
       tasks = JSON.parse(text);
@@ -170,16 +169,13 @@ async function loadTasks() {
   }
 }
 
-// Alglaadimine
 loadTasks();
 
-// Delegatsioon nupuvajutustele
 taskList.addEventListener("click", (e) => {
   const taskDiv = e.target.closest(".task");
   if (!taskDiv) return;
   const taskId = taskDiv.dataset.taskId;
 
-  // Märgi tehtuks
   if (e.target.classList.contains("mark-done-btn")) {
     fetch(`/mark-done/${taskId}`, {
       method: "POST",
@@ -191,7 +187,6 @@ taskList.addEventListener("click", (e) => {
       });
   }
 
-  // Märgi tegemata
   if (e.target.classList.contains("mark-not-done-btn")) {
     fetch(`/mark-not-done/${taskId}`, {
       method: "POST",

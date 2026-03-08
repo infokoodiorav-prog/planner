@@ -17,7 +17,6 @@ from flask import session, redirect
 
 load_dotenv()
 
-# SMTP
 SMTP_EMAIL = os.getenv("EMAIL_ADDRESS")
 SMTP_PASS = os.getenv("EMAIL_PASSWORD")
 
@@ -27,14 +26,13 @@ app.secret_key = os.getenv("FLASK_SECRET")
 
 IS_PRODUCTION = os.getenv("FLASK_ENV") == "production"
 
-#Session cookie'd
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SECURE"] = False  #//live siis True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 limiter = Limiter(
     key_func=get_remote_address,
-    default_limits=[] #MuudaKuiValmis
+    default_limits=[] #MuudanKuiLive
 )
 limiter.init_app(app)
 
@@ -117,7 +115,6 @@ def init_db():
         print("Database initialized successfully.")
 
 
-# Käivita andmebaasi initsialiseerimine
 init_db()
 
 
@@ -144,7 +141,6 @@ def send_email(to_email, subject, body_text=None, body_html=None):
     msg["From"] = f"KoodiOrav <{SMTP_EMAIL}>"
     msg["To"] = to_email
 
-    # Kui plain texti pole, lisa vaikimisi
     if body_text is None:
         body_text = "Tere! Sinu e-maili sisu puudub."
 
@@ -314,12 +310,11 @@ def resetPassword():
             with sqlite3.connect("users.db") as conn:
                 c = conn.cursor()
 
-                # Kontrolli users tabelit
+                
                 c.execute("SELECT id FROM users WHERE email = ?", (email,))
                 user = c.fetchone()
 
                 if user:
-                    # Genereeri token ja expiry users tabelis
                     token = secrets.token_urlsafe(32)
                     expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
 
@@ -334,7 +329,6 @@ def resetPassword():
                     send_email(email, "Parooli lähtestamise link", reset_link)
 
                 else:
-                    # Kontrolli persons tabelit
                     c.execute("SELECT id FROM persons WHERE email = ?", (email,))
                     person = c.fetchone()
 
@@ -342,7 +336,6 @@ def resetPassword():
                         token = secrets.token_urlsafe(32)
                         expiry = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
 
-                        # Salvesta token persons tabelisse
                         c.execute("""
                             UPDATE persons
                             SET access_token = ?, token_expiry = ?
@@ -367,19 +360,16 @@ def new_password(token):
         with sqlite3.connect("users.db") as conn:
             c = conn.cursor()
 
-            # Kontrolli users tabelit
             c.execute("SELECT id, reset_token_expiry FROM users WHERE reset_token = ?", (token,))
             user = c.fetchone()
             person = None
 
             if not user:
-                # Kontrolli persons tabelit
                 c.execute("SELECT id, token_expiry FROM persons WHERE access_token = ?", (token,))
                 person = c.fetchone()
                 if not person:
                     return "Invalid token"
 
-            # Kontrolli aegumist
             expiry_time = datetime.datetime.fromisoformat(user[1] if user else person[1])
             if datetime.datetime.utcnow() > expiry_time:
                 return "Token expired"
@@ -439,7 +429,6 @@ def add_task():
         """, (person_id, task_date, description, location, contact))
         conn.commit()
 
-        # Võta inimese e-mail
         c.execute("SELECT name, email FROM persons WHERE id = ?", (person_id,))
         person = c.fetchone()
 
@@ -488,7 +477,6 @@ def send_tasks_email(person_id):
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
 
-    # Kontrolli, et see inimene kuulub sellele kasutajale
     c.execute("""
         SELECT name, email FROM persons 
         WHERE id = ? AND user_id = ?
@@ -505,7 +493,6 @@ def send_tasks_email(person_id):
         conn.close()
         return jsonify({"success": False, "message": "Inimese e-mail puudub"}), 400
 
-    # Võta kõik ülesanded
     c.execute("""
         SELECT description, task_date, location, contact, completed
         FROM tasks
@@ -517,11 +504,9 @@ def send_tasks_email(person_id):
         conn.close()
         return jsonify({"success": False, "message": "Ülesandeid pole"}), 400
 
-    # 🔐 Genereeri magic link token
     token = secrets.token_urlsafe(32)
     expiry = datetime.datetime.utcnow() + datetime.timedelta(days=3)
 
-    # Salvestame tokeni kindlalt, kontrollides user_id
     c.execute("""
         UPDATE persons
         SET access_token = ?, token_expiry = ?
@@ -536,10 +521,7 @@ def send_tasks_email(person_id):
     conn.close()
 
     # 🔗 Loo access link
-    access_link = f"http://127.0.0.1:8000/person/{token}"  # lokaalse testi jaoks
-    # Kui oled internetis, pane siia avalik domeen: https://minudomeen.ee/person/{token}
-
-    # Koosta e-maili sisu
+    access_link = f"http://127.0.0.1:8000/person/{token}"
     body_text = f"Tere {person_name}!\n\nSul on järgmised ülesanded:\n"
     body_html = f"<html><body><p>Tere {person_name}!</p><p>Sul on järgmised ülesanded:</p><ul>"
 
@@ -559,7 +541,6 @@ def send_tasks_email(person_id):
     </body></html>
     """
 
-    # Saada e-mail
     send_email(
         to_email=to_email,
         subject="Teie ülesanded",
@@ -572,7 +553,7 @@ def send_tasks_email(person_id):
 @app.route("/get-tasks/<date>")
 @login_required
 def get_tasks(date):
-    person_id = request.args.get("person_id")  # valikuline filter
+    person_id = request.args.get("person_id")
 
     conn = sqlite3.connect("users.db")
     c = conn.cursor()
@@ -602,7 +583,6 @@ def get_tasks_worker():
 
     with sqlite3.connect("users.db") as conn:
         c = conn.cursor()
-        # Viga parandatud: lisatud koma task_date ja location vahele
         c.execute("""
             SELECT id, description, task_date, location, contact, completed
             FROM tasks
@@ -611,7 +591,6 @@ def get_tasks_worker():
         """, (worker_id,))
         tasks = c.fetchall()
 
-    # Tagasta JSON kujul
     result = [
         {
             "id": t[0],
@@ -698,14 +677,14 @@ def add_person():
     data = request.get_json()
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
-    password = data.get("password", "").strip()  # võib olla tühi
+    password = data.get("password", "").strip()
 
     if not name or not email:
         return jsonify({"error": "Täida vähemalt nimi ja e-mail!"}), 400
 
-    # Kui parool pole olemas, genereeri random parool
+
     if not password:
-        password = secrets.token_urlsafe(8)  # nt 8 tähemärki
+        password = secrets.token_urlsafe(8)
     hashed_password = generate_password_hash(password)
 
     with sqlite3.connect("users.db") as conn:
@@ -722,7 +701,7 @@ def add_person():
         conn.commit()
         person_id = c.lastrowid
 
-    # Saada e-mail töötajale koos parooliga
+
     body_text = f"""
 Tere {name}!
 
@@ -797,10 +776,10 @@ def person_dashboard(token):
 @app.route("/worker-login", methods=["GET", "POST"])
 def worker_login():
     if request.method == "GET":
-        # Näita login lehte
+
         return render_template("worker_login.html")
 
-    # Kui POST (login)
+
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
@@ -837,7 +816,6 @@ def worker_new_password(token):
     try:
         with sqlite3.connect("users.db") as conn:
             c = conn.cursor()
-            # Leia töötaja tokeni järgi
             c.execute("SELECT id, reset_token_expiry FROM persons WHERE access_token = ?", (token,))
             worker = c.fetchone()
             if not worker:
@@ -858,8 +836,7 @@ def worker_new_password(token):
 
                 hashed = generate_password_hash(new_password)
 
-                # Lisa uus väli persons tabelisse 'password' (kui pole juba olemas)
-                c.execute("ALTER TABLE persons ADD COLUMN IF NOT EXISTS password TEXT")  # SQLite 3.35+ vajalik
+                c.execute("ALTER TABLE persons ADD COLUMN IF NOT EXISTS password TEXT")
                 c.execute("""
                     UPDATE persons
                     SET password = ?, access_token = NULL, token_expiry = NULL
