@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Worker Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='dashboard.css') }}"
+    />
+  </head>
+
+  <body>
+    <div class="app">
+      <div class="topbar">
+        <h2>Tere, {{ name }} 👋</h2>
+        <button class="btn-ghost" id="logoutBtn" onclick="logout()">
+          Logi välja
+        </button>
+      </div>
+
+      <div class="dashboard">
+        <div class="card">
+          <h3>Ülesannete statistika</h3>
+
+          <div class="form-grid">
+            <input type="text" id="taskDate" placeholder="Vali kuupäev" />
+          </div>
+          <div class="stats-line">
+            <span><b id="totalTasks">0</b> Kokku</span>
+            <span><b id="doneTasks">0</b> Tehtud</span>
+            <span><b id="todoTasks">0</b> Tegemata</span>
+          </div>
+
+          <div class="progress-bar">
+            <div id="progressFill"></div>
+          </div>
+
+          <h3 style="margin-top: 25px">Teie ülesanded</h3>
+
+          <select id="filterTasks">
+            <option value="all">Kõik</option>
+            <option value="done">Tehtud</option>
+            <option value="todo">Tegemata</option>
+          </select>
+
+          <div id="taskList" class="task-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{{ url_for('static', filename='worker.js') }}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        flatpickr("#taskDate", {
+          dateFormat: "d/m/Y",
+          defaultDate: "today",
+          locale: "et",
+          onChange: loadTasks,
+        });
+        loadPersons();
+        loadTasks();
+      });
+    </script>
+  </body>
+</html>

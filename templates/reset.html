@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='index.css') }}"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tööpäeva planeerija - Salasõna taastamine</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <div class="icon">
+            <a href="{{ url_for('home') }}">
+              <div class="icon-inner">
+                <img
+                  src="/static/img/orav.png"
+                  alt="Logo"
+                  width="70px"
+                  height="70px"
+                />
+              </div>
+            </a>
+          </div>
+          <h2>Unustasid parooli?</h2>
+          <p>Sisestage oma e-mail, et saada reset link.</p>
+        </div>
+
+        <form id="resetForm" novalidate>
+          <div class="login">
+            <div class="login-input">
+              <input
+                type="email"
+                id="resetEmail"
+                placeholder="Email"
+                required
+              />
+              <label for="resetEmail">Email</label>
+
+              <div class="input-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <p id="resetResponse" class="error"></p>
+          <p id="resetLink" class="error"></p>
+          <p id="resetNote" class="error"></p>
+          <button type="button" class="neu-button" onclick="resetPassword()">
+            Loo reset link
+          </button>
+        </form>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

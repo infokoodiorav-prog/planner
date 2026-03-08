@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='dashboard.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <h2>Tere tulemast tagasi, {{ username }}!</h2>
+        <button class="btn-ghost" onclick="location.href = '/logout'">
+          Logi välja
+        </button>
+      </header>
+
+      <main class="dashboard">
+        <section class="card">
+          <h3>Lisa uus inimene</h3>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <input type="text" id="personName" placeholder=" " />
+              <label for="personName">Nimi</label>
+            </div>
+
+            <div class="input-group">
+              <input type="text" id="personEmail" placeholder=" " />
+              <label for="personEmail">Email</label>
+            </div>
+
+              <div class="input-group">
+                <input type="password" id="personPassword" placeholder=" " />
+                <label for="personPassword">Parool</label>
+          </div>
+
+          <button class="btn-primary" onclick="addPerson()">
+            Lisa inimene
+          </button>
+        </section>
+
+        <section class="card">
+          <h3>Lisa tööülesanne</h3>
+
+          <div class="form-grid">
+            <select id="personSelect" onchange="loadTasks()"></select>
+            <input type="text" id="taskDate" placeholder="Vali kuupäev" />
+
+            <div class="input-group">
+              <input type="text" id="description" placeholder=" " />
+              <label for="description">Kirjeldus</label>
+            </div>
+
+            <div class="input-group">
+              <input type="text" id="location" placeholder=" " />
+              <label for="location">Asukoht</label>
+            </div>
+
+            <div class="input-group">
+              <input type="text" id="contact" placeholder=" " />
+              <label for="contact">Kontakt</label>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="addTask()">Lisa ülesanne</button>
+        </section>
+
+        <section class="card">
+          <h3>Ülesanded</h3>
+          <ul id="taskList" class="task-list"></ul>
+          <button class="btn-primary" onclick="sendTasksEmail()">
+            Saada e-mail
+          </button>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        flatpickr("#taskDate", {
+          dateFormat: "d/m/Y",
+          defaultDate: "today",
+          locale: "et",
+          onChange: loadTasks,
+        });
+        loadPersons();
+        loadTasks();
+      });
+    </script>
+  </body>
+</html>
