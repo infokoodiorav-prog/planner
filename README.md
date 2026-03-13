@@ -37,8 +37,6 @@ A simple Python Flask app for **field task management**, allowing admins to assi
 4. Worker logs in via email  
 5. Worker sees today's tasks on the dashboard  
 6. Worker marks tasks as Done/Not Done (reason required if Not Done)  
-7. Worker confirms the day (locks tasks)  
-8. Admin exports CSV report for review  
 
 ## Setup
 
