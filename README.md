@@ -23,7 +23,7 @@ A simple Python Flask app for **field task management**, allowing admins to assi
 ## Tech Stack
 
 - **Backend:** Python, Flask  
-- **Database:** SQLite (or other, configured in `.env`)  
+- **Database:** SQLite (Configure in `.env`)  
 - **Authentication:** Flask-Login  
 - **Email notifications:** Flask-Mail  
 - **Rate limiting:** Flask-Limiter  
